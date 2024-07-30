@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"  # Expose the port 5432
+    
+    networks:
+      - my-network
+
+  web:
+    build: .
+    command: poetry run python manage.py runserver 0.0.0.0:8000 
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"     
+    depends_on:
+      - db
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      # - FORCE_SCRIPT_NAME=/api/
+
+volumes:
+  postgres_data:
+
+networks:
+  my-network:
+    driver: bridge
