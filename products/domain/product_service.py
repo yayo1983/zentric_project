@@ -1,4 +1,4 @@
-from products.infrastructure.interfaces.product_repository_interfaces import ProductRepositoryInterface 
+from products.infrastructure.product_repository_interfaces import ProductRepositoryInterface 
 from products.infrastructure.models import Product
 
 
@@ -7,15 +7,15 @@ class ProductService:
         self.product_repository = product_repository
         
 
-    def get_all_products(self) -> dict:
+    def get_all(self) -> dict:
         try:
-            return self.product_repository.get_all_products()
+            return self.product_repository.get_all()
         except Exception as e:
             raise
     
     
-    def get_product_by_id(self, product_id):
+    def get_by_id(self, product_id) -> Product:
         try:
-            return self.product_repository.get_product_by_id(product_id) 
+            return self.product_repository.get_by_id(product_id) 
         except Exception as e:
             raise

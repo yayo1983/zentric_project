@@ -17,7 +17,7 @@ class AbstractFactory(ABC):
     def create_repository(self) -> ProductRepository:
         pass
 
-class ProductsFactory(AbstractFactory):
+class NotificationFactory(AbstractFactory):
     
     
     def create_service(self, product_repository: ProductRepositoryInterface) -> ProductService:

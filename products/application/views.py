@@ -1,16 +1,20 @@
 import logging
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics
-from products.abstract_factory import ProductsFactoryView, FactoryView
+from rest_framework.permissions import IsAuthenticated
+
+from products.abstract_factory import ProductsFactory, AbstractFactory
+
 
 class BaseProductView:
         
-    def __init__(self, factory: FactoryView = ProductsFactoryView()):
+    def __init__(self, factory: AbstractFactory = ProductsFactory()):
         self.factory = factory
-        self.product_service = self.factory.create_service(self.factory.create_product_repository())
+        self.product_service = self.factory.create_service(self.factory.create_repository())
         self.serializer = self.factory.create_serializer()
-        self.queryset = self.product_service.get_all_products()
+        self.queryset = self.product_service.get_all()
         self.serializer_class = self.factory.create_serializer().get_serializer_class()
+        self.permission_classes = [IsAuthenticated]
         self.logger = logging.getLogger(__name__)
 
 
@@ -21,7 +25,6 @@ class BaseProductView:
         return self.serializer_class
 
 class ProductListCreate(BaseProductView, generics.ListCreateAPIView):
-        
 
     @swagger_auto_schema(
         operation_description="List all products",
@@ -47,11 +50,12 @@ class ProductListCreate(BaseProductView, generics.ListCreateAPIView):
             raise
 
 class ProductRetrieveUpdateDestroy(BaseProductView, generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
 
 
     def get_object(self):
         product_id = self.kwargs.get('pk')
-        product = self.product_service.get_product_by_id(product_id)
+        product = self.product_service.get_by_id(product_id)
         return product
     
    

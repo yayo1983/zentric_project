@@ -4,9 +4,9 @@ from products.infrastructure.models import Product
 class ProductRepositoryInterface(ABC):
     
     @abstractmethod
-    def get_all_products(self) -> dict:
+    def get_all(self) -> dict:
         pass
     
     @abstractmethod
-    def get_product_by_id(self, product_id) -> Product:
+    def get_by_id(self, product_id) -> Product:
         pass
