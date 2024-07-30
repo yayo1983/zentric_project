@@ -3,20 +3,16 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics
 from products.abstract_factory import ProductsFactoryView, FactoryView
 
-
-logger = logging.getLogger(__name__)
-
-class BaseProductView(generics.GenericAPIView):
-    factory: FactoryView
+class BaseProductView:
         
-    
-    def __init__(self, factory: FactoryView = ProductsFactoryView(), *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, factory: FactoryView = ProductsFactoryView()):
         self.factory = factory
         self.product_service = self.factory.create_service(self.factory.create_product_repository())
         self.serializer = self.factory.create_serializer()
         self.queryset = self.product_service.get_all_products()
         self.serializer_class = self.factory.create_serializer().get_serializer_class()
+        self.logger = logging.getLogger(__name__)
+
 
     def get_queryset(self):
         return self.queryset
@@ -35,7 +31,7 @@ class ProductListCreate(BaseProductView, generics.ListCreateAPIView):
         try:
             return super().get(request, *args, **kwargs)
         except Exception as e:
-            logger.error(f"Error occurred while listing products: {e}", exc_info=True)
+            self.logger.error(f"Error occurred while listing products: {e}", exc_info=True)
             raise
 
     @swagger_auto_schema(
@@ -47,7 +43,7 @@ class ProductListCreate(BaseProductView, generics.ListCreateAPIView):
         try:
             return super().post(request, *args, **kwargs)
         except Exception as e:
-            logger.error(f"Error occurred while creating a product: {e}", exc_info=True)
+            self.logger.error(f"Error occurred while creating a product: {e}", exc_info=True)
             raise
 
 class ProductRetrieveUpdateDestroy(BaseProductView, generics.RetrieveUpdateDestroyAPIView):
@@ -67,7 +63,7 @@ class ProductRetrieveUpdateDestroy(BaseProductView, generics.RetrieveUpdateDestr
         try:
             return super().get(request, *args, **kwargs)
         except Exception as e:
-            logger.error(f"Error occurred while retrieving product: {e}", exc_info=True)
+            self.logger.error(f"Error occurred while retrieving product: {e}", exc_info=True)
             raise
 
     @swagger_auto_schema(
@@ -79,7 +75,7 @@ class ProductRetrieveUpdateDestroy(BaseProductView, generics.RetrieveUpdateDestr
         try:
             return super().put(request, *args, **kwargs)
         except Exception as e:
-            logger.error(f"Error occurred while updating product: {e}", exc_info=True)
+            self.logger.error(f"Error occurred while updating product: {e}", exc_info=True)
             raise
 
     @swagger_auto_schema(
@@ -91,7 +87,7 @@ class ProductRetrieveUpdateDestroy(BaseProductView, generics.RetrieveUpdateDestr
         try:
             return super().patch(request, *args, **kwargs)
         except Exception as e:
-            logger.error(f"Error occurred while partially updating product: {e}", exc_info=True)
+            self.logger.error(f"Error occurred while partially updating product: {e}", exc_info=True)
             raise
 
     @swagger_auto_schema(
@@ -102,5 +98,5 @@ class ProductRetrieveUpdateDestroy(BaseProductView, generics.RetrieveUpdateDestr
         try:
             return super().delete(request, *args, **kwargs)
         except Exception as e:
-            logger.error(f"Error occurred while deleting product: {e}", exc_info=True)
+            self.logger.error(f"Error occurred while deleting product: {e}", exc_info=True)
             raise
