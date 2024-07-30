@@ -13,3 +13,30 @@ class ProductSerializer(serializers.ModelSerializer):
         
     def get_serializer_class(self):
         return ProductSerializer
+    
+    
+    def validate_name(self, value):
+        """
+            Validates that the name is not empty and has at least 3 characters.
+        """
+        if len(value) < 3:
+            raise serializers.ValidationError("El nombre debe tener al menos 3 caracteres.")
+        return value
+
+
+    def validate_price(self, value):
+        """
+            Validates that the price is positive.
+        """
+        if value <= 0:
+            raise serializers.ValidationError("El precio debe ser un valor positivo.")
+        return value
+
+
+    def validate(self, data):
+        """
+            Validates that expensive products are marked as premium.
+        """
+        if data['price'] > 1000 and 'premium' not in data['name'].lower():
+            raise serializers.ValidationError("Productos con precio superior a 1000 deben incluir 'premium' en el nombre.")
+        return data   

@@ -1,9 +1,7 @@
 import logging
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics
-from products.application.serializers import ProductSerializer
 from products.abstract_factory import ProductsFactoryView, FactoryView
-from products.infrastructure.models import Product
 
 
 logger = logging.getLogger(__name__)
@@ -31,7 +29,7 @@ class ProductListCreate(BaseProductView, generics.ListCreateAPIView):
 
     @swagger_auto_schema(
         operation_description="List all products",
-        responses={200: ProductSerializer(many=True)}
+        responses={200: 'ProductSerializer(many=True)'}
     )
     def get(self, request, *args, **kwargs):
         try:
@@ -42,8 +40,8 @@ class ProductListCreate(BaseProductView, generics.ListCreateAPIView):
 
     @swagger_auto_schema(
         operation_description="Create a new product",
-        responses={201: ProductSerializer},
-        request_body=ProductSerializer
+        responses={201: 'ProductSerializer'},
+        request_body='ProductSerializer'
     )
     def post(self, request, *args, **kwargs):
         try:
@@ -63,7 +61,7 @@ class ProductRetrieveUpdateDestroy(BaseProductView, generics.RetrieveUpdateDestr
    
     @swagger_auto_schema(
         operation_description="Retrieve a product by ID",
-        responses={200: ProductSerializer}
+        responses={200: 'ProductSerializer'}
     )
     def get(self, request, *args, **kwargs):
         try:
@@ -74,8 +72,8 @@ class ProductRetrieveUpdateDestroy(BaseProductView, generics.RetrieveUpdateDestr
 
     @swagger_auto_schema(
         operation_description="Update a product by ID",
-        responses={200: ProductSerializer},
-        request_body=ProductSerializer
+        responses={200: 'ProductSerializer'},
+        request_body='ProductSerializer'
     )
     def put(self, request, *args, **kwargs):
         try:
@@ -86,8 +84,8 @@ class ProductRetrieveUpdateDestroy(BaseProductView, generics.RetrieveUpdateDestr
 
     @swagger_auto_schema(
         operation_description="Partially update a product by ID",
-        responses={200: ProductSerializer},
-        request_body=ProductSerializer
+        responses={200: 'ProductSerializer'},
+        request_body='ProductSerializer'
     )
     def patch(self, request, *args, **kwargs):
         try:
