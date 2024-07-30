@@ -14,6 +14,6 @@ from django.core.wsgi import get_wsgi_application
 
 ENVIRONMENT = config('ENVIRONMENT') 
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'zentric_project.settings'+ENVIRONMENT)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'zentric_project.settings.'+ENVIRONMENT)
 
 application = get_wsgi_application()
