@@ -4,8 +4,18 @@ from products.infrastructure.models import Product
 
 class ProductService:
     def __init__(self, product_repository: ProductRepositoryInterface):
-        self.Product_repository = product_repository
+        self.product_repository = product_repository
         
 
-    def get_Product_abilities(self, name_id: str) -> Product:
-        return self.Product_repository.get_Product_abilities(name_id)
+    def get_all_products(self) -> dict:
+        try:
+            return self.product_repository.get_all_products()
+        except Exception as e:
+            raise
+    
+    
+    def get_product_by_id(self, product_id):
+        try:
+            return self.product_repository.get_product_by_id(product_id) 
+        except Exception as e:
+            raise

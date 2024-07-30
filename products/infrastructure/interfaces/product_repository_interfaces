@@ -1,8 +1,0 @@
-from abc import ABC, abstractmethod
-from products.infrastructure.models import Product
-
-class PokemonRepositoryInterface(ABC):
-    
-    @abstractmethod
-    def get_pokemon_abilities(self, name_id: str) -> Product:
-        pass

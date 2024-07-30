@@ -10,3 +10,6 @@ class ProductSerializer(serializers.ModelSerializer):
             'description': {'help_text': 'Description of the product'},
             'price': {'help_text': 'Price of the product'},
         }
+        
+    def get_serializer_class(self):
+        return ProductSerializer
