@@ -1,10 +1,10 @@
 from products.infrastructure.models import Product
-from products.infrastructure.product_repository_interfaces import (
-    ProductRepositoryInterface,
+from shareds.infrastructure.shared_repository_interfaces import (
+    SharedRepositoryInterface,
 )
 
 
-class ProductRepository(ProductRepositoryInterface):
+class ProductRepository(SharedRepositoryInterface):
 
     def get_all(self) -> dict:
         try:

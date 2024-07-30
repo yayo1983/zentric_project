@@ -1,7 +1,13 @@
 from rest_framework import serializers
 from ..infrastructure.models import Product
+from shareds.application.abstract_serializer import AbstractSerializer, CommonMetaClass
 
-class ProductSerializer(serializers.ModelSerializer):
+
+class ProductSerializer(AbstractSerializer, serializers.ModelSerializer, metaclass=CommonMetaClass):
+    
+    def get_serializer_class(self):
+        return ProductSerializer
+    
     class Meta:
         model = Product
         fields = '__all__'
@@ -11,9 +17,6 @@ class ProductSerializer(serializers.ModelSerializer):
             'price': {'help_text': 'Price of the product'},
         }
         
-    def get_serializer_class(self):
-        return ProductSerializer
-    
     
     def validate_name(self, value):
         """

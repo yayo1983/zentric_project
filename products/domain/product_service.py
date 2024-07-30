@@ -1,9 +1,12 @@
-from products.infrastructure.product_repository_interfaces import ProductRepositoryInterface 
+from shareds.domain.abstract_service import AbstractService
+from shareds.infrastructure.shared_repository_interfaces import (
+    SharedRepositoryInterface,
+)
 from products.infrastructure.models import Product
 
 
-class ProductService:
-    def __init__(self, product_repository: ProductRepositoryInterface):
+class ProductService(AbstractService):
+    def __init__(self, product_repository: SharedRepositoryInterface):
         self.product_repository = product_repository
         
 

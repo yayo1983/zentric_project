@@ -1,10 +1,10 @@
 from notifications.infrastructure.models import Notification
-from notifications.infrastructure.notification_repository_interfaces import (
-    NotificationRepositoryInterface,
+from shareds.infrastructure.shared_repository_interfaces import (
+    SharedRepositoryInterface,
 )
 
 
-class NotificationRepository(NotificationRepositoryInterface):
+class NotificationRepository(SharedRepositoryInterface):
 
     def get_all(self) -> dict:
         try:
@@ -14,7 +14,7 @@ class NotificationRepository(NotificationRepositoryInterface):
         except Exception as e:
             raise ValueError(f"An error occurred while retrieving products: {e}") from e
 
-    def get_by_id(self, notification_id) -> Notification:
+    def get_by_id(self, notification_id: int) -> Notification:
         try:
             return Notification.objects.get(id=notification_id)
         except Exception as e:

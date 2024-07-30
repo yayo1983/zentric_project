@@ -1,22 +1,14 @@
-import logging
 from rest_framework import generics
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.permissions import IsAuthenticated
-from notifications.abstract_factory import NotificationFactory, AbstractFactory
-
+from notifications.notification_factory import NotificationFactory
+from shareds.application.view import BaseSharedView
        
-class BaseNotificationView:
-        
-    def __init__(self, factory: AbstractFactory = NotificationFactory()):
-        self.factory = factory
-        self.product_service = self.factory.create_service(self.factory.create_repository())
-        self.serializer = self.factory.create_serializer()
-        self.queryset = self.product_service.get_all()
-        self.serializer_class = self.factory.create_serializer().get_serializer_class()
-        self.permission_classes = [IsAuthenticated]
-        self.logger = logging.getLogger(__name__)
 
-class NotificationListCreateView(BaseNotificationView, generics.ListCreateAPIView):
+
+class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(NotificationFactory())
+        generics.ListCreateAPIView.__init__(self, *args, **kwargs)
     
 
     @swagger_auto_schema(
@@ -46,7 +38,10 @@ class NotificationListCreateView(BaseNotificationView, generics.ListCreateAPIVie
         # Filter notifications by authenticated user
         return self.queryset.filter(recipient=self.request.user)
 
-class NotificationRetrieveUpdateDestroyView(BaseNotificationView, generics.RetrieveUpdateDestroyAPIView):
+class NotificationRetrieveUpdateDestroyView(BaseSharedView, generics.RetrieveUpdateDestroyAPIView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(NotificationFactory())
+        generics.ListCreateAPIView.__init__(self, *args, **kwargs)
     
 
     def get_queryset(self):
@@ -54,12 +49,15 @@ class NotificationRetrieveUpdateDestroyView(BaseNotificationView, generics.Retri
         return self.queryset.filter(recipient=self.request.user)
     
 
-class NotificationMarkAsReadView(BaseNotificationView, generics.RetrieveUpdateDestroyAPIView):
+class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyAPIView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(NotificationFactory())
+        generics.ListCreateAPIView.__init__(self, *args, **kwargs)
     
 
     def get_object(self):
         product_id = self.kwargs.get('pk')
-        product = self.product_service.get_product_by_id(product_id)
+        product = self.service.get_by_id(product_id)
         return product
     
    

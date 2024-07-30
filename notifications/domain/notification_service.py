@@ -1,11 +1,12 @@
-from notifications.infrastructure.notification_repository_interfaces import (
-    NotificationRepositoryInterface,
+from shareds.infrastructure.shared_repository_interfaces import (
+    SharedRepositoryInterface,
 )
 from notifications.infrastructure.models import Notification
+from shareds.domain.abstract_service import AbstractService
 
 
-class NotificationService:
-    def __init__(self, notification_repository: NotificationRepositoryInterface):
+class NotificationService(AbstractService):
+    def __init__(self, notification_repository: SharedRepositoryInterface):
         self.notification_repository = notification_repository
 
     def get_all(self) -> dict:
