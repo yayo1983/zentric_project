@@ -3,65 +3,61 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
-from notifications.notification_factory import NotificationFactory
+from tickets.ticket_factory import TicketFactory
 from shareds.application.view import BaseSharedView
 
-class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
+class TicketListCreateView(BaseSharedView, generics.ListCreateAPIView):
     def __init__(self):
-        super().__init__(NotificationFactory())
+        super().__init__(TicketFactory())
         generics.ListCreateAPIView.__init__(self)
 
     @swagger_auto_schema(
-        operation_description="List all notifications",
-        responses={200: "NotificationSerializer(many=True)"},
+        operation_description="List all Tickets",
+        responses={200: "TicketSerializer(many=True)"},
     )
     @method_decorator(cache_page(60*15))  # Cache 15 mins
     def get(self, request, *args, **kwargs):
         try:
             return super().get(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while listing notifications: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            # self.logger.error(f"Error occurred while listing Tickets: {e}", exc_info=True)
+            raise
 
     @swagger_auto_schema(
-        operation_description="Create a new notification",
-        responses={201: "NotificationSerializer"},
-        request_body="NotificationSerializer",
+        operation_description="Create a new Ticket",
+        responses={201: "TicketSerializer"},
+        request_body="TicketSerializer",
     )
     def post(self, request, *args, **kwargs):
         try:
             return super().post(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while creating a notification: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            # self.logger.error(f"Error occurred while creating a Ticket: {e}", exc_info=True)
+            raise
 
 
-class NotificationRetrieveUpdateDestroyView(
+class TicketRetrieveUpdateDestroyView(
     BaseSharedView, generics.RetrieveUpdateDestroyAPIView
 ):
     def __init__(self):
-        super().__init__(NotificationFactory())
+        super().__init__(TicketFactory())
         generics.ListCreateAPIView.__init__(self)
 
 
-class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyAPIView):
-    def __init__(self, factory=NotificationFactory()):
-        super().__init__(factory)
-
     def get_object(self):
         try:
-            notification_id = self.kwargs.get("pk")
-            product = self.service.get_by_id(notification_id)
-            return product
+            ticket_id = self.kwargs.get("pk")
+            ticket = self.service.get_by_id(ticket_id)
+            return ticket
         except Exception as e:
             self.logger.error(
-                f"Error occurred while retrieving notification: {e}", exc_info=True
+                f"Error occurred while retrieving Ticket: {e}", exc_info=True
             )
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Retrieve a product by ID",
-        responses={200: "NotificationSerializer"},
+        responses={200: "TicketSerializer"},
     )
     @method_decorator(cache_page(60*15))  # Cache 15 mins
     def get(self, request, *args, **kwargs):
@@ -69,41 +65,41 @@ class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyA
             return super().get(request, *args, **kwargs)
         except Exception as e:
             self.logger.error(
-                f"Error occurred while retrieving notification: {e}", exc_info=True
+                f"Error occurred while retrieving Ticket: {e}", exc_info=True
             )
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
-        operation_description="Update a notification by ID",
-        responses={200: "NotificationSerializer"},
-        request_body="NotificationSerializer",
+        operation_description="Update a Ticket by ID",
+        responses={200: "TicketSerializer"},
+        request_body="TicketSerializer",
     )
     def put(self, request, *args, **kwargs):
         try:
             return super().put(request, *args, **kwargs)
         except Exception as e:
             self.logger.error(
-                f"Error occurred while updating notification: {e}", exc_info=True
+                f"Error occurred while updating Ticket: {e}", exc_info=True
             )
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
-        operation_description="Partially update a notification by ID",
-        responses={200: "NotificationSerializer"},
-        request_body="NotificationSerializer",
+        operation_description="Partially update a Ticket by ID",
+        responses={200: "TicketSerializer"},
+        request_body="TicketSerializer",
     )
     def patch(self, request, *args, **kwargs):
         try:
             return super().patch(request, *args, **kwargs)
         except Exception as e:
             self.logger.error(
-                f"Error occurred while partially updating notification: {e}",
+                f"Error occurred while partially updating Ticket: {e}",
                 exc_info=True,
             )
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
-        operation_description="Delete a notification by ID",
+        operation_description="Delete a Ticket by ID",
         responses={204: "No Content"},
     )
     def delete(self, request, *args, **kwargs):
@@ -111,6 +107,6 @@ class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyA
             return super().delete(request, *args, **kwargs)
         except Exception as e:
             self.logger.error(
-                f"Error occurred while deleting notification: {e}", exc_info=True
+                f"Error occurred while deleting Ticket: {e}", exc_info=True
             )
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)

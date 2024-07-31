@@ -1,6 +1,6 @@
+from rest_framework import generics, status
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import generics
-from django.core.cache import cache
+from rest_framework.response import Response
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from products.product_factory import ProductsFactory
@@ -23,7 +23,7 @@ class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
             return super().get(request, *args, **kwargs)
         except Exception as e:
             self.logger.error(f"Error occurred while listing products: {e}", exc_info=True)
-            raise
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Create a new product",
@@ -35,7 +35,7 @@ class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
             return super().post(request, *args, **kwargs)
         except Exception as e:
             self.logger.error(f"Error occurred while creating a product: {e}", exc_info=True)
-            raise
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestroyAPIView):
     def __init__(self, *args, **kwargs):
@@ -50,10 +50,9 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
             return product
         except Exception as e:
             self.logger.error(f"Error occurred while retrieving product: {e}", exc_info=True)
-            raise
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     
-   
     @swagger_auto_schema(
         operation_description="Retrieve a product by ID",
         responses={200: 'ProductSerializer'}
@@ -64,7 +63,7 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
             return super().get(request, *args, **kwargs)
         except Exception as e:
             self.logger.error(f"Error occurred while retrieving product: {e}", exc_info=True)
-            raise
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Update a product by ID",
@@ -76,7 +75,7 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
             return super().put(request, *args, **kwargs)
         except Exception as e:
             self.logger.error(f"Error occurred while updating product: {e}", exc_info=True)
-            raise
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Partially update a product by ID",
@@ -88,7 +87,7 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
             return super().patch(request, *args, **kwargs)
         except Exception as e:
             self.logger.error(f"Error occurred while partially updating product: {e}", exc_info=True)
-            raise
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Delete a product by ID",
@@ -99,4 +98,4 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
             return super().delete(request, *args, **kwargs)
         except Exception as e:
             self.logger.error(f"Error occurred while deleting product: {e}", exc_info=True)
-            raise
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)

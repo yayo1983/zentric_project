@@ -20,6 +20,8 @@ schema_view = get_schema_view(
 api_patterns = [
     path('products/', include('products.urls')),
     path('notifications/', include('notifications.urls')),
+    path('inventories/', include('inventories.urls')),
+    path('tickets/', include('tickets.urls')),
 ]
 
 urlpatterns = [

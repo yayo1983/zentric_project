@@ -15,8 +15,8 @@ class NotificationService(AbstractService):
         except Exception as e:
             raise
 
-    def get_by_id(self, product_id) -> Notification:
+    def get_by_id(self, notification_id) -> Notification:
         try:
-            return self.notification_repository.get_by_id(product_id)
+            return self.notification_repository.get_by_id(notification_id)
         except Exception as e:
             raise

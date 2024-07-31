@@ -2,7 +2,6 @@ from pathlib import Path
 from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Configuraciones comunes
 
 DEBUG = False
 
@@ -15,22 +14,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "rest_framework",
-    "drf_yasg",
-    "products",
-    'notifications'
+    'rest_framework',
+    'drf_yasg',
+    'products',
+    'notifications',
+    'inventories',
+    'tickets'
 ]
 
-
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django_redis.cache.RedisCache',
-#         'LOCATION': str(REDIS_HOST)+':'+str(REDIS_PORT)+'/1',
-#         'OPTIONS': {
-#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-#         }
-#     }
-# }
 
 # RATELIMIT_CACHE = 'default'
 # RATELIMIT_USE_CACHE = 'default'
