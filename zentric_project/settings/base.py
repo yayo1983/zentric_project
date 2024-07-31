@@ -47,6 +47,17 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+# Configuration variables for pagination
+PAGE_SIZE = 10
+MAX_PAGE_SIZE = 100
+
+# Setting global pagination
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': PAGE_SIZE,
+    'DEFAULT_PAGE_SIZE': PAGE_SIZE,
+    'MAX_PAGE_SIZE': MAX_PAGE_SIZE,
+}
 
 ROOT_URLCONF = "zentric_project.urls"
 

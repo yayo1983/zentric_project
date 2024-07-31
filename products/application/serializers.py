@@ -17,6 +17,7 @@ class ProductSerializer(AbstractSerializer, serializers.ModelSerializer, metacla
             'price': {'help_text': 'Price of the product'},
         }
         
+        read_only_fields = ['created_at'] 
     
     def validate_name(self, value):
         """

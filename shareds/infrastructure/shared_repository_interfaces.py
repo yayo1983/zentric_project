@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class SharedRepositoryInterface(ABC):
 
     @abstractmethod
-    def get_all(self) -> dict:
+    def get_all(self):
         pass
 
     @abstractmethod

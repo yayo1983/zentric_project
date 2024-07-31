@@ -9,7 +9,7 @@ class NotificationService(AbstractService):
     def __init__(self, notification_repository: SharedRepositoryInterface):
         self.notification_repository = notification_repository
 
-    def get_all(self) -> dict:
+    def get_all(self):
         try:
             return self.notification_repository.get_all()
         except Exception as e:

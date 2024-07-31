@@ -6,11 +6,9 @@ from shareds.infrastructure.shared_repository_interfaces import (
 
 class NotificationRepository(SharedRepositoryInterface):
 
-    def get_all(self) -> dict:
+    def get_all(self):
         try:
-            notifications = Notification.objects.all()
-            notifications_list = list(notifications.values())
-            return notifications_list
+            return Notification.objects.select_related('recipient').all()
         except Exception as e:
             raise ValueError(f"An error occurred while retrieving products: {e}") from e
 

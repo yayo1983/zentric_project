@@ -1,7 +1,11 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 from products.product_factory import ProductsFactory
 from shareds.application.view import BaseSharedView
+
 
 
 class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
@@ -13,6 +17,7 @@ class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
         operation_description="List all products",
         responses={200: 'ProductSerializer(many=True)'}
     )
+    @method_decorator(cache_page(60*15))  # Cache 15 mins
     def get(self, request, *args, **kwargs):
         try:
             return super().get(request, *args, **kwargs)
@@ -39,15 +44,21 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
 
 
     def get_object(self):
-        product_id = self.kwargs.get('pk')
-        product = self.service.get_by_id(product_id)
-        return product
+        try:
+            product_id = self.kwargs.get('pk')
+            product = self.service.get_by_id(product_id)
+            return product
+        except Exception as e:
+            self.logger.error(f"Error occurred while retrieving product: {e}", exc_info=True)
+            raise
+        
     
    
     @swagger_auto_schema(
         operation_description="Retrieve a product by ID",
         responses={200: 'ProductSerializer'}
     )
+    @method_decorator(cache_page(60*15))  # Cache 15 mins
     def get(self, request, *args, **kwargs):
         try:
             return super().get(request, *args, **kwargs)
