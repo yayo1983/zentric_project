@@ -1,7 +1,12 @@
 from rest_framework import serializers
 from tickets.infrastructure.models import Ticket
+from shareds.application.abstract_serializer import AbstractSerializer, CommonMetaClass
 
-class TicketSerializer(serializers.ModelSerializer):
+class TicketSerializer(AbstractSerializer, serializers.ModelSerializer, metaclass=CommonMetaClass):
+    
+    def get_serializer_class(self):
+        return TicketSerializer
+    
     class Meta:
         model = Ticket
         fields = ['id', 'title', 'description', 'created_at', 'updated_at', 'status', 'assigned_to']
