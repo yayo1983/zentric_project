@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import permissions
+from graphene_django.views import GraphQLView
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -27,6 +29,7 @@ api_patterns = [
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/', include(api_patterns)),
+    path('graphql/', GraphQLView.as_view(graphiql=True)),  # `graphiql=True` Enables the graphical interface
     path(
         "swagger/",
         schema_view.with_ui("swagger", cache_timeout=0),

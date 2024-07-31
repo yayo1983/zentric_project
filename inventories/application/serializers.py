@@ -1,8 +1,12 @@
 from django.db import models
 from rest_framework import serializers
 from ..infrastructure.models import InventoryTransaction
+from shareds.application.abstract_serializer import AbstractSerializer, CommonMetaClass
 
-class InventoryTransactionSerializer(serializers.ModelSerializer):
+class InventoryTransactionSerializer(AbstractSerializer, serializers.ModelSerializer, metaclass=CommonMetaClass):
+    
+    def get_serializer_class(self):
+        return InventoryTransactionSerializer
     class Meta:
         model = InventoryTransaction
         fields = ['id', 'product', 'transaction_type', 'quantity', 'date']

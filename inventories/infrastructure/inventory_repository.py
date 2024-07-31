@@ -8,7 +8,7 @@ class InventoryRepository(SharedRepositoryInterface):
 
     def get_all(self):
         try:
-            return InventoryTransaction.objects.select_related('recipient').all()
+            return InventoryTransaction.objects.select_related('product').all()
         except Exception as e:
             raise ValueError(f"An error occurred while retrieving products: {e}") from e
 

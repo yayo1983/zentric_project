@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'graphene_django',
     'drf_yasg',
     'products',
     'notifications',
@@ -23,8 +24,9 @@ INSTALLED_APPS = [
 ]
 
 
-# RATELIMIT_CACHE = 'default'
-# RATELIMIT_USE_CACHE = 'default'
+GRAPHENE = {
+    'SCHEMA': 'data_access.infrastructure.schema.schema',  
+}
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
