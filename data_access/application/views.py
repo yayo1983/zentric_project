@@ -18,7 +18,6 @@ class PrivateGraphQLView(GraphQLView):
     - dispatch: Overrides the default `dispatch` method to apply the `login_required` decorator, ensuring that only authenticated
       users can access the GraphQL endpoint. The decorator redirects unauthenticated users to the login page.
     """
-
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         """
