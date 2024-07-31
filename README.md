@@ -124,6 +124,20 @@ Before setting up the project, ensure you have the following installed:
 
     The application will be available at `http://localhost:8000`.
 
+
+6. **Access to AWS**:
+
+    - Install aws cli
+    
+    - After configure the aws cli with these command:
+
+    ```bash
+    aws configure
+    ```
+
+    The application will be available at `http://localhost:8000`.
+
+
 ## Testing
 
 ### Running Unit and Integration Tests
