@@ -5,7 +5,7 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from products.product_factory import ProductsFactory
 from shareds.application.view import BaseSharedView
-
+from products.application.serializers import ProductSerializer
 
 
 class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
@@ -34,7 +34,7 @@ class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
 
     @swagger_auto_schema(
         operation_description="List all products",
-        responses={200: 'ProductSerializer(many=True)'}
+        responses={200: ProductSerializer(many=True)}
     )
     @method_decorator(cache_page(60*15))  # Cache 15 mins
     def get(self, request, *args, **kwargs):
@@ -61,8 +61,8 @@ class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
 
     @swagger_auto_schema(
         operation_description="Create a new product",
-        responses={201: 'ProductSerializer'},
-        request_body='ProductSerializer'
+        responses={201: ProductSerializer},
+        request_body=ProductSerializer
     )
     def post(self, request, *args, **kwargs):
         """
@@ -134,7 +134,7 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
 
     @swagger_auto_schema(
         operation_description="Retrieve a product by ID",
-        responses={200: 'ProductSerializer'}
+        responses={200: ProductSerializer}
     )
     @method_decorator(cache_page(60*15))  # Cache 15 mins
     def get(self, request, *args, **kwargs):
@@ -161,8 +161,8 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
 
     @swagger_auto_schema(
         operation_description="Update a product by ID",
-        responses={200: 'ProductSerializer'},
-        request_body='ProductSerializer'
+        responses={200: ProductSerializer},
+        request_body=ProductSerializer
     )
     def put(self, request, *args, **kwargs):
         """
@@ -188,8 +188,8 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
 
     @swagger_auto_schema(
         operation_description="Partially update a product by ID",
-        responses={200: 'ProductSerializer'},
-        request_body='ProductSerializer'
+        responses={200: ProductSerializer},
+        request_body=ProductSerializer
     )
     def patch(self, request, *args, **kwargs):
         """

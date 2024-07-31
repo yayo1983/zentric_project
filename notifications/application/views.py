@@ -5,6 +5,7 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from notifications.notification_factory import NotificationFactory
 from shareds.application.view import BaseSharedView
+from notifications.application.serializers import NotificationSerializer
 
 class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
     """
@@ -28,7 +29,7 @@ class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
 
     @swagger_auto_schema(
         operation_description="List all notifications",
-        responses={200: "NotificationSerializer(many=True)"},
+        responses={200: NotificationSerializer(many=True)},
     )
     @method_decorator(cache_page(60*15))  # Cache response for 15 minutes
     def get(self, request, *args, **kwargs):
@@ -54,8 +55,8 @@ class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
 
     @swagger_auto_schema(
         operation_description="Create a new notification",
-        responses={201: "NotificationSerializer"},
-        request_body="NotificationSerializer",
+        responses={201: NotificationSerializer},
+        request_body=NotificationSerializer,
     )
     def post(self, request, *args, **kwargs):
         """
@@ -99,7 +100,7 @@ class NotificationRetrieveUpdateDestroyView(BaseSharedView, generics.RetrieveUpd
         Initialize the view with the `NotificationFactory` and `RetrieveUpdateDestroyAPIView`.
         """
         super().__init__(NotificationFactory())
-        generics.ListCreateAPIView.__init__(self)
+        generics.RetrieveUpdateDestroyAPIView.__init__(self)
 
 
 class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyAPIView):
@@ -148,7 +149,7 @@ class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyA
 
     @swagger_auto_schema(
         operation_description="Retrieve a notification by ID",
-        responses={200: "NotificationSerializer"},
+        responses={200: NotificationSerializer},
     )
     @method_decorator(cache_page(60*15))  # Cache response for 15 minutes
     def get(self, request, *args, **kwargs):
@@ -176,8 +177,8 @@ class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyA
 
     @swagger_auto_schema(
         operation_description="Update a notification by ID",
-        responses={200: "NotificationSerializer"},
-        request_body="NotificationSerializer",
+        responses={200: NotificationSerializer},
+        request_body=NotificationSerializer,
     )
     def put(self, request, *args, **kwargs):
         """
@@ -204,8 +205,8 @@ class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyA
 
     @swagger_auto_schema(
         operation_description="Partially update a notification by ID",
-        responses={200: "NotificationSerializer"},
-        request_body="NotificationSerializer",
+        responses={200: NotificationSerializer},
+        request_body=NotificationSerializer,
     )
     def patch(self, request, *args, **kwargs):
         """

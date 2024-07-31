@@ -5,7 +5,7 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from tickets.ticket_factory import TicketFactory
 from shareds.application.view import BaseSharedView
-
+from tickets.application.serializers import TicketSerializer
 
 class TicketListCreateView(BaseSharedView, generics.ListCreateAPIView):
     """
@@ -33,7 +33,7 @@ class TicketListCreateView(BaseSharedView, generics.ListCreateAPIView):
 
     @swagger_auto_schema(
         operation_description="List all Tickets",
-        responses={200: "TicketSerializer(many=True)"},
+        responses={200: TicketSerializer(many=True)},
     )
     @method_decorator(cache_page(60*15))  # Cache 15 mins
     def get(self, request, *args, **kwargs):
@@ -59,8 +59,8 @@ class TicketListCreateView(BaseSharedView, generics.ListCreateAPIView):
 
     @swagger_auto_schema(
         operation_description="Create a new Ticket",
-        responses={201: "TicketSerializer"},
-        request_body="TicketSerializer",
+        responses={201: TicketSerializer},
+        request_body=TicketSerializer,
     )
     def post(self, request, *args, **kwargs):
         """
@@ -135,7 +135,7 @@ class TicketRetrieveUpdateDestroyView(BaseSharedView, generics.RetrieveUpdateDes
 
     @swagger_auto_schema(
         operation_description="Retrieve a ticket by ID",
-        responses={200: "TicketSerializer"},
+        responses={200: TicketSerializer},
     )
     @method_decorator(cache_page(60*15))  # Cache 15 mins
     def get(self, request, *args, **kwargs):
@@ -162,8 +162,8 @@ class TicketRetrieveUpdateDestroyView(BaseSharedView, generics.RetrieveUpdateDes
 
     @swagger_auto_schema(
         operation_description="Update a ticket by ID",
-        responses={200: "TicketSerializer"},
-        request_body="TicketSerializer",
+        responses={200: TicketSerializer},
+        request_body=TicketSerializer,
     )
     def put(self, request, *args, **kwargs):
         """
@@ -189,8 +189,8 @@ class TicketRetrieveUpdateDestroyView(BaseSharedView, generics.RetrieveUpdateDes
 
     @swagger_auto_schema(
         operation_description="Partially update a ticket by ID",
-        responses={200: "TicketSerializer"},
-        request_body="TicketSerializer",
+        responses={200: TicketSerializer},
+        request_body=TicketSerializer,
     )
     def patch(self, request, *args, **kwargs):
         """

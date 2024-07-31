@@ -5,6 +5,7 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from inventories.inventory_factory import InventoryFactory
 from shareds.application.view import BaseSharedView
+from inventories.application.serializers import InventoryTransactionSerializer
 
 class InventoryListCreateView(BaseSharedView, generics.ListCreateAPIView):
     """
@@ -21,7 +22,7 @@ class InventoryListCreateView(BaseSharedView, generics.ListCreateAPIView):
 
     @swagger_auto_schema(
         operation_description="List all inventories",
-        responses={200: "InventorySerializer(many=True)"},
+        responses={200: InventoryTransactionSerializer(many=True)},
     )
     @method_decorator(cache_page(60*15))  # Cache response for 15 minutes
     def get(self, request, *args, **kwargs):
@@ -38,8 +39,8 @@ class InventoryListCreateView(BaseSharedView, generics.ListCreateAPIView):
 
     @swagger_auto_schema(
         operation_description="Create a new inventory",
-        responses={201: "InventorySerializer"},
-        request_body="InventorySerializer",
+        responses={201: InventoryTransactionSerializer},
+        request_body=InventoryTransactionSerializer,
     )
     def post(self, request, *args, **kwargs):
         """
@@ -84,7 +85,7 @@ class InventoryRetrieveUpdateDestroyView(
 
     @swagger_auto_schema(
         operation_description="Retrieve an inventory by ID",
-        responses={200: "InventorySerializer"},
+        responses={200: InventoryTransactionSerializer},
     )
     @method_decorator(cache_page(60*15))  # Cache response for 15 minutes
     def get(self, request, *args, **kwargs):
@@ -102,8 +103,8 @@ class InventoryRetrieveUpdateDestroyView(
 
     @swagger_auto_schema(
         operation_description="Update an inventory by ID",
-        responses={200: "InventorySerializer"},
-        request_body="InventorySerializer",
+        responses={200: InventoryTransactionSerializer},
+        request_body=InventoryTransactionSerializer,
     )
     def put(self, request, *args, **kwargs):
         """
@@ -119,8 +120,8 @@ class InventoryRetrieveUpdateDestroyView(
 
     @swagger_auto_schema(
         operation_description="Partially update an inventory by ID",
-        responses={200: "InventorySerializer"},
-        request_body="InventorySerializer",
+        responses={200: InventoryTransactionSerializer},
+        request_body=InventoryTransactionSerializer,
     )
     def patch(self, request, *args, **kwargs):
         """

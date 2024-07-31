@@ -13,7 +13,7 @@ class SNSRepositoryAdapter:
         topic_arn (str): The ARN (Amazon Resource Name) for the SNS topic.
     """
 
-    def __init__(self, topic_arn):
+    def __init__(self, topic_arn: str):
         """
         Initializes the SNSRepositoryAdapter with the specified topic ARN.
 
