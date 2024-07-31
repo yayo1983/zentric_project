@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'tickets'
 ]
 
+LOGIN_URL = '/admin/login/'
 
 GRAPHENE = {
     'SCHEMA': 'data_access.infrastructure.schema.schema',  

@@ -30,6 +30,7 @@ class Query(graphene.ObjectType):
     all_inventories = graphene.List(InventoryType)
     all_notifications = graphene.List(NotificationType)
     all_tickets = graphene.List(TicketType)
+    product = graphene.Field(ProductType, id=graphene.ID(required=True)) 
 
     def resolve_all_products(self, info, **kwargs):
         return Product.objects.all()

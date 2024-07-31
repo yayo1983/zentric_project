@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from graphene_django.views import GraphQLView
 
-# Create your views here.
+class PrivateGraphQLView(GraphQLView):
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
