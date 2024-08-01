@@ -1,13 +1,10 @@
 from notifications.domain.notification_service import NotificationService
 from notifications.application.serializers import NotificationSerializer
-from notifications.infrastructure.sns_repository_interfaces import (
-    SNSRepositoryInterface,
-)
 from shareds.infrastructure.shared_repository_interfaces import (
     SharedRepositoryInterface,
 )
 from notifications.infrastructure.notification_repository import NotificationRepository
-from notifications.infrastructure.sns_repository_adapter import SNSRepositoryAdapter
+from shareds.infrastructure.sns_repository_adapter import SNSRepositoryAdapter
 from shareds.abstract_factory import AbstractFactory
 
 

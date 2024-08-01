@@ -17,7 +17,7 @@ class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
 
     Methods:
     - get: Handles GET requests to list all notifications. Uses caching for 15 minutes to
-      improve performance.
+    improve performance.
     - post: Handles POST requests to create a new notification.
     """
 
@@ -78,16 +78,18 @@ class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
         """
         try:
             message = request.data.get("message", "")
+            id_user_selected = request.data["recipient"]
+            email = self.service.get_email_user(id_user_selected)
             result_sns = None
-            result_notification = super().post(request, *args, **kwargs)
-            if self.request.user.email is not None and result_notification:
-                result_sns = self.service.publish_message_to_subscriber(
-                    self.request.user.email, message
-                )
+            response = super().post(request, *args, **kwargs)
+            if email and response.status_code in {201, 200}:
+                result_sns = self.service.publish_message_to_subscriber(email, message)
             if result_sns is not None:
-                return result_notification
-            else:
-                return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return response
+            return Response(
+                {"No se pudo enviar la notificación"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         except Exception as e:
             self.logger.error(
                 f"Error occurred while creating a notification: {e}", exc_info=True

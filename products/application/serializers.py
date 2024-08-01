@@ -25,6 +25,10 @@ class ProductSerializer(AbstractSerializer, serializers.ModelSerializer, metacla
         """
         if len(value) < 3:
             raise serializers.ValidationError("El nombre debe tener al menos 3 caracteres.")
+        
+        if Product.objects.filter(name=value).exists():
+            raise serializers.ValidationError("A product with this name already exists.")
+        
         return value
 
 

@@ -1,6 +1,5 @@
 import boto3
 from botocore.exceptions import ClientError
-from decouple import config
 
 class SNSRepositoryAdapter:
     """
@@ -13,9 +12,6 @@ class SNSRepositoryAdapter:
     Attributes:
         topic_arn (str): The ARN (Amazon Resource Name) for the SNS topic.
     """
-    
-    def __init__(self):
-        self.topic_arn = config('TOPIC_ARN')
 
     def sns_client(self):
         """
