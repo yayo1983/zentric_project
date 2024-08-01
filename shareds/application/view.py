@@ -1,6 +1,7 @@
 import logging
 from rest_framework.permissions import IsAuthenticated
 from shareds.abstract_factory import AbstractFactory
+from shareds.domain.abstract_service import AbstractService
 from rest_framework.pagination import PageNumberPagination
 from django.conf import settings
 
@@ -11,6 +12,8 @@ class ProductPagination(PageNumberPagination):
     
     
 class BaseSharedView:
+    factory: AbstractFactory
+    service: AbstractService
         
     def __init__(self, factory: AbstractFactory):
         self.factory = factory

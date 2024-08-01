@@ -7,6 +7,7 @@ from notifications.notification_factory import NotificationFactory
 from shareds.application.view import BaseSharedView
 from notifications.application.serializers import NotificationSerializer
 
+
 class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
     """
     API view for listing and creating notifications.
@@ -31,7 +32,7 @@ class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
         operation_description="List all notifications",
         responses={200: NotificationSerializer(many=True)},
     )
-    @method_decorator(cache_page(60*15))  # Cache response for 15 minutes
+    @method_decorator(cache_page(60 * 15))  # Cache response for 15 minutes
     def get(self, request, *args, **kwargs):
         """
         List all notifications.
@@ -50,8 +51,10 @@ class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
         try:
             return super().get(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while listing notifications: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            self.logger.error(
+                f"Error occurred while listing notifications: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Create a new notification",
@@ -74,13 +77,27 @@ class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
             Response object with the created notification.
         """
         try:
-            return super().post(request, *args, **kwargs)
+            message = request.data.get("message", "")
+            result_sns = None
+            result_notification = super().post(request, *args, **kwargs)
+            if self.request.user.email is not None and result_notification:
+                result_sns = self.service.publish_message_to_subscriber(
+                    self.request.user.email, message
+                )
+            if result_sns is not None:
+                return result_notification
+            else:
+                return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            self.logger.error(f"Error occurred while creating a notification: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            self.logger.error(
+                f"Error occurred while creating a notification: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class NotificationRetrieveUpdateDestroyView(BaseSharedView, generics.RetrieveUpdateDestroyAPIView):
+class NotificationRetrieveUpdateDestroyView(
+    BaseSharedView, generics.RetrieveUpdateDestroyAPIView
+):
     """
     API view for retrieving, updating, and deleting a single notification.
 
@@ -145,13 +162,13 @@ class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyA
             self.logger.error(
                 f"Error occurred while retrieving notification: {e}", exc_info=True
             )
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Retrieve a notification by ID",
         responses={200: NotificationSerializer},
     )
-    @method_decorator(cache_page(60*15))  # Cache response for 15 minutes
+    @method_decorator(cache_page(60 * 15))  # Cache response for 15 minutes
     def get(self, request, *args, **kwargs):
         """
         Retrieve a specific notification by ID.
@@ -173,7 +190,7 @@ class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyA
             self.logger.error(
                 f"Error occurred while retrieving notification: {e}", exc_info=True
             )
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Update a notification by ID",
@@ -201,7 +218,7 @@ class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyA
             self.logger.error(
                 f"Error occurred while updating notification: {e}", exc_info=True
             )
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Partially update a notification by ID",
@@ -230,7 +247,7 @@ class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyA
                 f"Error occurred while partially updating notification: {e}",
                 exc_info=True,
             )
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Delete a notification by ID",
@@ -257,4 +274,4 @@ class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyA
             self.logger.error(
                 f"Error occurred while deleting notification: {e}", exc_info=True
             )
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)

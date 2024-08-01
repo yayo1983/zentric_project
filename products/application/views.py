@@ -1,11 +1,24 @@
 from rest_framework import generics, status
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
+from rest_framework.permissions import BasePermission
+from rest_framework.exceptions import PermissionDenied
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from products.product_factory import ProductsFactory
 from shareds.application.view import BaseSharedView
 from products.application.serializers import ProductSerializer
+
+
+class CanCreateProductPermission(BasePermission):
+    """
+    Custom permission class to check if a user has permission to create a product.
+    """
+
+    def has_permission(self, request, view):
+        return request.user.has_perm(
+            "products.add_product"
+        )  # Replace with your actual permission check
 
 
 class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
@@ -32,11 +45,22 @@ class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
         super().__init__(ProductsFactory())
         generics.ListCreateAPIView.__init__(self, *args, **kwargs)
 
+    def get_queryset(self):
+        try:
+            service = self.factory.create_service(self.factory.create_repository())
+            return service.filter_by_user_id(self.request.user.id)
+        except Exception as e:
+            self.logger.error(
+                f"Error occurred while filtering products: {e}", exc_info=True
+            )
+            # Return an empty queryset to ensure compatibility with Django views
+            return self.factory.create_product().objects.none()
+
     @swagger_auto_schema(
         operation_description="List all products",
-        responses={200: ProductSerializer(many=True)}
+        responses={200: ProductSerializer(many=True)},
     )
-    @method_decorator(cache_page(60*15))  # Cache 15 mins
+    @method_decorator(cache_page(60 * 15))  # Cache 15 mins
     def get(self, request, *args, **kwargs):
         """
         Handle GET requests to list all products.
@@ -56,13 +80,15 @@ class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
         try:
             return super().get(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while listing products: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            self.logger.error(
+                f"Error occurred while listing products: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Create a new product",
         responses={201: ProductSerializer},
-        request_body=ProductSerializer
+        request_body=ProductSerializer,
     )
     def post(self, request, *args, **kwargs):
         """
@@ -81,11 +107,27 @@ class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
             Response: A Django REST framework Response object with the created product or an error message.
         """
         try:
+            # Check if the user has the permission to create a product
+            if not self.request.user.has_perm(
+                "products.add_product"
+            ):  # Replace with your actual permission check
+                raise PermissionDenied("You do not have permission to create products.")
+
             return super().post(request, *args, **kwargs)
+        except PermissionDenied as e:
+            self.logger.error(f"Permission denied: {e}", exc_info=True)
+            return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+
         except Exception as e:
-            self.logger.error(f"Error occurred while creating a product: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestroyAPIView):
+            self.logger.error(
+                f"Error occurred while creating a product: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductRetrieveUpdateDestroy(
+    BaseSharedView, generics.RetrieveUpdateDestroyAPIView
+):
     """
     View for retrieving, updating, and deleting a single product.
 
@@ -125,18 +167,20 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
             Response: A Django REST framework Response object with an error message if an error occurs.
         """
         try:
-            product_id = self.kwargs.get('pk')
+            product_id = self.kwargs.get("pk")
             product = self.service.get_by_id(product_id)
             return product
         except Exception as e:
-            self.logger.error(f"Error occurred while retrieving product: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            self.logger.error(
+                f"Error occurred while retrieving product: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Retrieve a product by ID",
-        responses={200: ProductSerializer}
+        responses={200: ProductSerializer},
     )
-    @method_decorator(cache_page(60*15))  # Cache 15 mins
+    @method_decorator(cache_page(60 * 15))  # Cache 15 mins
     def get(self, request, *args, **kwargs):
         """
         Handle GET requests to retrieve a product by its ID.
@@ -156,13 +200,15 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
         try:
             return super().get(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while retrieving product: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            self.logger.error(
+                f"Error occurred while retrieving product: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Update a product by ID",
         responses={200: ProductSerializer},
-        request_body=ProductSerializer
+        request_body=ProductSerializer,
     )
     def put(self, request, *args, **kwargs):
         """
@@ -183,13 +229,15 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
         try:
             return super().put(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while updating product: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            self.logger.error(
+                f"Error occurred while updating product: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Partially update a product by ID",
         responses={200: ProductSerializer},
-        request_body=ProductSerializer
+        request_body=ProductSerializer,
     )
     def patch(self, request, *args, **kwargs):
         """
@@ -210,12 +258,13 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
         try:
             return super().patch(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while partially updating product: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            self.logger.error(
+                f"Error occurred while partially updating product: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
-        operation_description="Delete a product by ID",
-        responses={204: 'No Content'}
+        operation_description="Delete a product by ID", responses={204: "No Content"}
     )
     def delete(self, request, *args, **kwargs):
         """
@@ -236,6 +285,7 @@ class ProductRetrieveUpdateDestroy(BaseSharedView, generics.RetrieveUpdateDestro
         try:
             return super().delete(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while deleting product: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+            self.logger.error(
+                f"Error occurred while deleting product: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)

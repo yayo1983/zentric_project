@@ -43,19 +43,30 @@ Before setting up the project, ensure you have the following installed:
     poetry install
     ```
 
-3. **Apply migrations**:
+3. **Create Topic SNS**:
+
+    In AWS, create a topic
+
+4. **Configure variable**
+ Use the file envExample, create .env file and put the values of each variable:
+
+    ```bash
+    poetry install
+    ```
+
+5. **Apply migrations**:
 
     ```bash
     poetry run python manage.py migrate
     ```
 
-4. **Create a superuser** (for Django admin):
+6. **Create a superuser** (for Django admin):
 
     ```bash
     poetry run python manage.py createsuperuser
     ```
 
-5. **Run the development server**:
+7. **Run the development server**:
 
     ```bash
     poetry run python manage.py runserver
@@ -166,4 +177,12 @@ Before setting up the project, ensure you have the following installed:
 ## Contact
 
 For questions or issues, please contact [yazanenator@gmail.com](mailto:yazanenator@gmail.com).
+
+### Presentation of project
+
+    ```bash
+    https://docs.google.com/presentation/d/1jw5r4SSRENpjsEJjc_IFpAhqg4kaQrg4jporqiLqlZc/edit?hl=es#slide=id.g2efb191e0f4_0_40
+    ```
+
+
 

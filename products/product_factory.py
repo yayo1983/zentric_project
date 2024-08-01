@@ -1,5 +1,6 @@
 from products.domain.product_service import ProductService
 from products.application.serializers import ProductSerializer
+from products.infrastructure.models import Product
 from products.infrastructure.product_repository import ProductRepository
 from shareds.abstract_factory import AbstractFactory
 from shareds.infrastructure.shared_repository_interfaces import SharedRepositoryInterface
@@ -18,3 +19,6 @@ class ProductsFactory(AbstractFactory):
     
     def create_repository(self) -> ProductRepository:
         return ProductRepository()
+    
+    def create_product(self) -> Product:
+        return Product

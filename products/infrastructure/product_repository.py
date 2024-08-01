@@ -2,13 +2,14 @@ from products.infrastructure.models import Product
 from shareds.infrastructure.shared_repository_interfaces import (
     SharedRepositoryInterface,
 )
+from products.infrastructure.product_repository_interfaces import ProductRepositoryInterface
 
 
-class ProductRepository(SharedRepositoryInterface):
+class ProductRepository(SharedRepositoryInterface, ProductRepositoryInterface):
     """
     Repository for managing Product data.
 
-    This repository provides methods for retrieving product data from the database. 
+    This repository provides methods for retrieving product data from the database.
     It includes functionality to retrieve all products and to retrieve a specific product by its ID.
 
     Methods:
@@ -38,12 +39,12 @@ class ProductRepository(SharedRepositoryInterface):
         except Exception as e:
             raise ValueError(f"An error occurred while retrieving products: {e}") from e
 
-    def get_by_id(self, product_id) -> Product:
+    def get_by_id(self, product_id: int) -> Product:
         """
         Retrieve a specific product by its ID.
 
         This method fetches a single Product object from the database based on the provided ID.
-        If the product with the specified ID is not found or an error occurs during retrieval, 
+        If the product with the specified ID is not found or an error occurs during retrieval,
         a ValueError is raised with an appropriate error message.
 
         Args:
@@ -62,3 +63,24 @@ class ProductRepository(SharedRepositoryInterface):
                 f"An error occurred while retrieving a product: {e}"
             ) from e
 
+    def filter_by_user_id(self, user_id: int):
+        """
+        Retrieve a list of products by user ID.
+
+        This method fetches all  the Products object from the database based on the provided user ID.
+        If the product with the specified ID is not found or an error occurs during retrieval,
+        a ValueError is raised with an appropriate error message.
+
+        Args:
+            user_id (int): The ID of the product to retrieve.
+
+        Returns:
+            dict: A list of the Products object by the specified ID.
+
+        Raises:
+            ValueError: If pecifiednot found products with the user ID is not found or an error occurs while retrieving it.
+        """
+        try:
+            return Product.objects.filter(user=user_id)
+        except Exception as e:
+            return Product.objects.none()
