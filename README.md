@@ -153,13 +153,19 @@ Before setting up the project, ensure you have the following installed:
 
 ### Running Unit and Integration Tests
 
-1. **Run tests with Poetry**:
+1. **Populate table product**:
+Using the follow command to populate product table in database
+    ```bash
+    python manage.py populate_products
+    ```
+
+2. **Run tests with Poetry**:
 
     ```bash
     poetry run python manage.py test
     ```
 
-2. **Run tests with Docker**:
+3. **Run tests with Docker**:
 
     ```bash
     docker-compose exec web python manage.py test
