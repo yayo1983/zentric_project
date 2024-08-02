@@ -1,12 +1,22 @@
 from django.test import TestCase
-from inventories.infrastructure.models import Inventory
-from products.infrastructure.models import Product
+from django.contrib.auth.models import User
+from tickets.infrastructure.models import Ticket
 
-class InventoryModelTest(TestCase):
+class TicketModelTest(TestCase):
     def setUp(self):
-        self.product = Product.objects.create(name="Test Product", description="A test product", price=100.00)
-        self.inventory = Inventory.objects.create(product=self.product, quantity=10)
+        self.user = User.objects.create_user(username="testuser", password="12345")
+        self.ticket = Ticket.objects.create(
+            title="Test Ticket",
+            description="This is a test ticket.",
+            status="open",
+            assigned_to=self.user
+        )
 
-    def test_inventory_creation(self):
-        self.assertEqual(self.inventory.product, self.product)
-        self.assertEqual(self.inventory.quantity, 10)
+    def test_ticket_creation(self):
+        self.assertEqual(self.ticket.title, "Test Ticket")
+        self.assertEqual(self.ticket.description, "This is a test ticket.")
+        self.assertEqual(self.ticket.status, "open")
+        self.assertEqual(self.ticket.assigned_to, self.user)
+
+    def test_ticket_string_representation(self):
+        self.assertEqual(str(self.ticket), self.ticket.title)

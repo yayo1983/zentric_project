@@ -165,6 +165,13 @@ Using the follow command to populate product table in database
     poetry run python manage.py test
     ```
 
+    or execute only one file test
+    
+    ```bash
+    python manage.py test products.tests.test_models
+    ```
+    
+
 3. **Run tests with Docker**:
 
     ```bash

@@ -11,3 +11,4 @@ class ProductModelTests(TestCase):
 
     def test_product_string_representation(self):
         self.assertEqual(str(self.product), self.product.name)
+        

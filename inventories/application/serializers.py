@@ -2,11 +2,14 @@ from django.db import models
 from rest_framework import serializers
 from ..infrastructure.models import InventoryTransaction
 from shareds.application.abstract_serializer import AbstractSerializer, CommonMetaClass
+from products.infrastructure.models import Product
 
 # The `InventoryTransactionSerializer` class is a serializer class in Django used for serializing and
 # deserializing instances of the `InventoryTransaction` model. It extends `AbstractSerializer` and
 # `serializers.ModelSerializer` and is defined with a metaclass `CommonMetaClass`.
 class InventoryTransactionSerializer(AbstractSerializer, serializers.ModelSerializer, metaclass=CommonMetaClass):
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    quantity = serializers.IntegerField()
     
     def get_serializer_class(self):
         return InventoryTransactionSerializer
