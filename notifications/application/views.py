@@ -1,12 +1,22 @@
 from rest_framework import generics, status
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from drf_yasg.utils import swagger_auto_schema
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from notifications.notification_factory import NotificationFactory
-from shareds.application.view import BaseSharedView
+from shareds.application.view import BaseSharedView, DynamicGroupPermission
 from notifications.application.serializers import NotificationSerializer
+from shareds.sns_factory import SNSFactory
 
+class IsNotificationGroup(DynamicGroupPermission):
+    def __init__(self):
+        super().__init__(group_name="notification_group")
+
+
+class HasNotificationPermission(DynamicGroupPermission):
+    def __init__(self):
+        super().__init__(perm_code="notifications.view_notification")
 
 class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
     """
@@ -27,6 +37,7 @@ class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
         """
         super().__init__(NotificationFactory())
         generics.ListCreateAPIView.__init__(self)
+        self.permission_classes = [IsAuthenticated, IsNotificationGroup, HasNotificationPermission]
 
     @swagger_auto_schema(
         operation_description="List all notifications",
@@ -58,8 +69,8 @@ class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
 
     @swagger_auto_schema(
         operation_description="Create a new notification",
-        responses={201: NotificationSerializer},
-        request_body=NotificationSerializer,
+        responses={201: NotificationSerializer()},
+        request_body=NotificationSerializer(),
     )
     def post(self, request, *args, **kwargs):
         """
@@ -77,13 +88,15 @@ class NotificationListCreateView(BaseSharedView, generics.ListCreateAPIView):
             Response object with the created notification.
         """
         try:
+            result_sns = None
             message = request.data.get("message", "")
             id_user_selected = request.data["recipient"]
             email = self.service.get_email_user(id_user_selected)
-            result_sns = None
             response = super().post(request, *args, **kwargs)
             if email and response.status_code in {201, 200}:
-                result_sns = self.service.publish_message_to_subscriber(email, message)
+                sns_factory = SNSFactory()
+                sns_service = sns_factory.create_service(sns_factory.create_repository())
+                result_sns = sns_service.publish_message_to_subscriber(email, message)
             if result_sns is not None:
                 return response
             return Response(
@@ -168,7 +181,7 @@ class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyA
 
     @swagger_auto_schema(
         operation_description="Retrieve a notification by ID",
-        responses={200: NotificationSerializer},
+        responses={200: NotificationSerializer()},
     )
     @method_decorator(cache_page(60 * 15))  # Cache response for 15 minutes
     def get(self, request, *args, **kwargs):
@@ -196,8 +209,8 @@ class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyA
 
     @swagger_auto_schema(
         operation_description="Update a notification by ID",
-        responses={200: NotificationSerializer},
-        request_body=NotificationSerializer,
+        responses={200: NotificationSerializer()},
+        request_body=NotificationSerializer(),
     )
     def put(self, request, *args, **kwargs):
         """
@@ -224,8 +237,8 @@ class NotificationMarkAsReadView(BaseSharedView, generics.RetrieveUpdateDestroyA
 
     @swagger_auto_schema(
         operation_description="Partially update a notification by ID",
-        responses={200: NotificationSerializer},
-        request_body=NotificationSerializer,
+        responses={200: NotificationSerializer()},
+        request_body=NotificationSerializer(),
     )
     def patch(self, request, *args, **kwargs):
         """

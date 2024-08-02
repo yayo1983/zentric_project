@@ -12,8 +12,11 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         count = 0
         fake = Faker()
-        for _ in range(100):
+        generated_names = set()
+        while count < 100:
             name = fake.word().capitalize()
+            if name in generated_names:
+                continue  # If the name was already generated, skip it and generate another one
             description = fake.text()
             user = User.objects.order_by('?').first()
             result = Product.objects.create(
@@ -23,5 +26,6 @@ class Command(BaseCommand):
                 price=round(random.uniform(10.0, 1000.0), 2)
             )
             count += 1
+            generated_names.add(name) 
             print("Register", count, result)
         self.stdout.write(self.style.SUCCESS('Successfully populated the database with products'))

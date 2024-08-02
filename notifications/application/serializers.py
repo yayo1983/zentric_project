@@ -4,7 +4,7 @@ from shareds.application.abstract_serializer import AbstractSerializer, CommonMe
 from django.contrib.auth.models import User
 
 class NotificationSerializer(AbstractSerializer, serializers.ModelSerializer, metaclass=CommonMetaClass):
-    
+    recipient = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     
     def get_serializer_class(self):
         return NotificationSerializer

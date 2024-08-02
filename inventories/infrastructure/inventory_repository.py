@@ -34,7 +34,11 @@ class InventoryRepository(SharedRepositoryInterface):
             ValueError: If an error occurs during the retrieval process.
         """
         try:
-            return InventoryTransaction.objects.select_related("product").all()
+            return (
+                InventoryTransaction.objects.select_related("product")
+                .all()
+                .order_by("id")
+            )
         except Exception as e:
             raise ValueError(
                 f"An error occurred while retrieving inventory transactions: {e}"
@@ -59,7 +63,7 @@ class InventoryRepository(SharedRepositoryInterface):
             during retrieval.
         """
         try:
-            return InventoryTransaction.objects.get(id=inventory_id)
+            return InventoryTransaction.objects.get(id=inventory_id).order_by("id")
         except Exception as e:
             raise ValueError(
                 f"An error occurred while retrieving the inventory transaction: {e}"

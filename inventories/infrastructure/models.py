@@ -12,7 +12,7 @@ class InventoryTransaction(models.Model):
     ENTRY = 'entry', _('Entry')
     EXIT = 'exit', _('Exit')
 
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='inventory_transactions')
+    product = models.ForeignKey(Product, on_delete=models.DO_NOTHING, related_name='inventory_transactions')
     transaction_type = models.CharField(max_length=3, choices=TRANSACTION_TYPES)
     quantity = models.PositiveIntegerField()
     date = models.DateTimeField(auto_now_add=True)

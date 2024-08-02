@@ -1,11 +1,23 @@
 from rest_framework import generics, status
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from drf_yasg.utils import swagger_auto_schema
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from inventories.inventory_factory import InventoryFactory
-from shareds.application.view import BaseSharedView
+from shareds.application.view import BaseSharedView, DynamicGroupPermission
 from inventories.application.serializers import InventoryTransactionSerializer
+
+
+class IsInventoriesGroup(DynamicGroupPermission):
+    def __init__(self):
+        super().__init__(group_name="product_group")
+
+
+class HasInventoriesPermission(DynamicGroupPermission):
+    def __init__(self):
+        super().__init__(perm_code="products.view_product")
+
 
 class InventoryListCreateView(BaseSharedView, generics.ListCreateAPIView):
     """
@@ -19,12 +31,13 @@ class InventoryListCreateView(BaseSharedView, generics.ListCreateAPIView):
         """
         super().__init__(InventoryFactory())
         generics.ListCreateAPIView.__init__(self)
+        self.permission_classes = [IsAuthenticated, IsInventoriesGroup, HasInventoriesPermission]
 
     @swagger_auto_schema(
         operation_description="List all inventories",
         responses={200: InventoryTransactionSerializer(many=True)},
     )
-    @method_decorator(cache_page(60*15))  # Cache response for 15 minutes
+    @method_decorator(cache_page(60 * 15))  # Cache response for 15 minutes
     def get(self, request, *args, **kwargs):
         """
         Handle GET request to list all inventories.
@@ -39,8 +52,8 @@ class InventoryListCreateView(BaseSharedView, generics.ListCreateAPIView):
 
     @swagger_auto_schema(
         operation_description="Create a new inventory",
-        responses={201: InventoryTransactionSerializer},
-        request_body=InventoryTransactionSerializer,
+        responses={201: InventoryTransactionSerializer()},
+        request_body=InventoryTransactionSerializer(),
     )
     def post(self, request, *args, **kwargs):
         """
@@ -52,6 +65,7 @@ class InventoryListCreateView(BaseSharedView, generics.ListCreateAPIView):
             # Log the error and re-raise the exception
             # self.logger.error(f"Error occurred while creating an inventory: {e}", exc_info=True)
             raise
+
 
 class InventoryRetrieveUpdateDestroyView(
     BaseSharedView, generics.RetrieveUpdateDestroyAPIView
@@ -81,13 +95,13 @@ class InventoryRetrieveUpdateDestroyView(
             self.logger.error(
                 f"Error occurred while retrieving inventory: {e}", exc_info=True
             )
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Retrieve an inventory by ID",
-        responses={200: InventoryTransactionSerializer},
+        responses={200: InventoryTransactionSerializer()},
     )
-    @method_decorator(cache_page(60*15))  # Cache response for 15 minutes
+    @method_decorator(cache_page(60 * 15))  # Cache response for 15 minutes
     def get(self, request, *args, **kwargs):
         """
         Handle GET request to retrieve an inventory by ID.
@@ -99,12 +113,12 @@ class InventoryRetrieveUpdateDestroyView(
             self.logger.error(
                 f"Error occurred while retrieving inventory: {e}", exc_info=True
             )
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Update an inventory by ID",
-        responses={200: InventoryTransactionSerializer},
-        request_body=InventoryTransactionSerializer,
+        responses={200: InventoryTransactionSerializer()},
+        request_body=InventoryTransactionSerializer(),
     )
     def put(self, request, *args, **kwargs):
         """
@@ -116,12 +130,12 @@ class InventoryRetrieveUpdateDestroyView(
             self.logger.error(
                 f"Error occurred while updating inventory: {e}", exc_info=True
             )
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Partially update an inventory by ID",
-        responses={200: InventoryTransactionSerializer},
-        request_body=InventoryTransactionSerializer,
+        responses={200: InventoryTransactionSerializer()},
+        request_body=InventoryTransactionSerializer(),
     )
     def patch(self, request, *args, **kwargs):
         """
@@ -134,7 +148,7 @@ class InventoryRetrieveUpdateDestroyView(
                 f"Error occurred while partially updating inventory: {e}",
                 exc_info=True,
             )
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Delete an inventory by ID",
@@ -150,4 +164,4 @@ class InventoryRetrieveUpdateDestroyView(
             self.logger.error(
                 f"Error occurred while deleting inventory: {e}", exc_info=True
             )
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)

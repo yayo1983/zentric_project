@@ -33,9 +33,11 @@ class NotificationRepository(SharedRepositoryInterface):
             ValueError: If an error occurs during the retrieval process.
         """
         try:
-            return Notification.objects.select_related('recipient').all()
+            return Notification.objects.select_related("recipient").all().order_by("id")
         except Exception as e:
-            raise ValueError(f"An error occurred while retrieving notifications: {e}") from e
+            raise ValueError(
+                f"An error occurred while retrieving notifications: {e}"
+            ) from e
 
     def get_by_id(self, notification_id: int) -> Notification:
         """
@@ -56,7 +58,7 @@ class NotificationRepository(SharedRepositoryInterface):
             during retrieval.
         """
         try:
-            return Notification.objects.get(id=notification_id)
+            return Notification.objects.get(id=notification_id).order_by("id")
         except Exception as e:
             raise ValueError(
                 f"An error occurred while retrieving the notification: {e}"

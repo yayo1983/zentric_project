@@ -32,7 +32,7 @@ class ProductRepository(SharedRepositoryInterface, ProductRepositoryInterface):
         """
         try:
             # Retrieve all Product objects
-            products = Product.objects.all()
+            products = Product.objects.all().order_by('id')
             # Convert the queryset to a list of dictionaries
             products_list = list(products.values())
             return products_list
@@ -81,6 +81,6 @@ class ProductRepository(SharedRepositoryInterface, ProductRepositoryInterface):
             ValueError: If pecifiednot found products with the user ID is not found or an error occurs while retrieving it.
         """
         try:
-            return Product.objects.filter(user=user_id)
+            return Product.objects.filter(user=user_id).order_by('id')
         except Exception as e:
             return Product.objects.none()

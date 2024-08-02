@@ -171,6 +171,24 @@ Using the follow command to populate product table in database
     docker-compose exec web python manage.py test
     ```
 
+### Running spwecific script
+
+1. **script to asign permission to user in product**:
+
+First go to the script assign_permission_to_product.py and in the line 21
+put the username where want assign permission.
+
+After execute script with the next commands
+
+    ```bash
+    python manage.py shell
+    ```
+    After, inside of Django's shell execute
+
+        ```bash
+    exec(open('scripts/assign_permissions.py').read())
+    ```
+
 ## Project Structure
 
 - `inventories/`: Application for managing inventory transactions.

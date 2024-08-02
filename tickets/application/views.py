@@ -1,11 +1,23 @@
 from rest_framework import generics, status
-from drf_yasg.utils import swagger_auto_schema
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from tickets.ticket_factory import TicketFactory
-from shareds.application.view import BaseSharedView
+from shareds.application.view import BaseSharedView, DynamicGroupPermission
 from tickets.application.serializers import TicketSerializer
+
+
+class IsInTicketGroup(DynamicGroupPermission):
+    def __init__(self):
+        super().__init__(group_name="ticket_group")
+
+
+class HasTicketPermission(DynamicGroupPermission):
+    def __init__(self):
+        super().__init__(perm_code="tickets.view_ticket")
+
 
 class TicketListCreateView(BaseSharedView, generics.ListCreateAPIView):
     """
@@ -30,12 +42,17 @@ class TicketListCreateView(BaseSharedView, generics.ListCreateAPIView):
         """
         super().__init__(TicketFactory())
         generics.ListCreateAPIView.__init__(self)
+        self.permission_classes = [
+            IsAuthenticated,
+            IsInTicketGroup,
+            HasTicketPermission,
+        ]
 
     @swagger_auto_schema(
         operation_description="List all Tickets",
         responses={200: TicketSerializer(many=True)},
     )
-    @method_decorator(cache_page(60*15))  # Cache 15 mins
+    @method_decorator(cache_page(60 * 15))  # Cache 15 mins
     def get(self, request, *args, **kwargs):
         """
         Handle GET requests to list all tickets.
@@ -54,13 +71,15 @@ class TicketListCreateView(BaseSharedView, generics.ListCreateAPIView):
         try:
             return super().get(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while listing Tickets: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            self.logger.error(
+                f"Error occurred while listing Tickets: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Create a new Ticket",
-        responses={201: TicketSerializer},
-        request_body=TicketSerializer,
+        responses={201: TicketSerializer()},
+        request_body=TicketSerializer(),
     )
     def post(self, request, *args, **kwargs):
         """
@@ -80,12 +99,15 @@ class TicketListCreateView(BaseSharedView, generics.ListCreateAPIView):
         try:
             return super().post(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while creating a Ticket: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-        
+            self.logger.error(
+                f"Error occurred while creating a Ticket: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class TicketRetrieveUpdateDestroyView(BaseSharedView, generics.RetrieveUpdateDestroyAPIView):
+
+class TicketRetrieveUpdateDestroyView(
+    BaseSharedView, generics.RetrieveUpdateDestroyAPIView
+):
     """
     View for retrieving, updating, and deleting a single ticket.
 
@@ -130,14 +152,16 @@ class TicketRetrieveUpdateDestroyView(BaseSharedView, generics.RetrieveUpdateDes
             ticket = self.service.get_by_id(ticket_id)
             return ticket
         except Exception as e:
-            self.logger.error(f"Error occurred while retrieving Ticket: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            self.logger.error(
+                f"Error occurred while retrieving Ticket: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Retrieve a ticket by ID",
-        responses={200: TicketSerializer},
+        responses={200: TicketSerializer()},
     )
-    @method_decorator(cache_page(60*15))  # Cache 15 mins
+    @method_decorator(cache_page(60 * 15))  # Cache 15 mins
     def get(self, request, *args, **kwargs):
         """
         Handle GET requests to retrieve a ticket by its ID.
@@ -157,13 +181,15 @@ class TicketRetrieveUpdateDestroyView(BaseSharedView, generics.RetrieveUpdateDes
         try:
             return super().get(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while retrieving Ticket: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            self.logger.error(
+                f"Error occurred while retrieving Ticket: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Update a ticket by ID",
-        responses={200: TicketSerializer},
-        request_body=TicketSerializer,
+        responses={200: TicketSerializer()},
+        request_body=TicketSerializer(),
     )
     def put(self, request, *args, **kwargs):
         """
@@ -184,13 +210,15 @@ class TicketRetrieveUpdateDestroyView(BaseSharedView, generics.RetrieveUpdateDes
         try:
             return super().put(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while updating Ticket: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            self.logger.error(
+                f"Error occurred while updating Ticket: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Partially update a ticket by ID",
-        responses={200: TicketSerializer},
-        request_body=TicketSerializer,
+        responses={200: TicketSerializer()},
+        request_body=TicketSerializer(),
     )
     def patch(self, request, *args, **kwargs):
         """
@@ -211,8 +239,10 @@ class TicketRetrieveUpdateDestroyView(BaseSharedView, generics.RetrieveUpdateDes
         try:
             return super().patch(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while partially updating Ticket: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            self.logger.error(
+                f"Error occurred while partially updating Ticket: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         operation_description="Delete a ticket by ID",
@@ -237,6 +267,7 @@ class TicketRetrieveUpdateDestroyView(BaseSharedView, generics.RetrieveUpdateDes
         try:
             return super().delete(request, *args, **kwargs)
         except Exception as e:
-            self.logger.error(f"Error occurred while deleting Ticket: {e}", exc_info=True)
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+            self.logger.error(
+                f"Error occurred while deleting Ticket: {e}", exc_info=True
+            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)

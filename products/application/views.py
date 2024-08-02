@@ -1,24 +1,22 @@
 from rest_framework import generics, status
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
-from rest_framework.permissions import BasePermission
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import IsAuthenticated
+from drf_yasg.utils import swagger_auto_schema
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from products.product_factory import ProductsFactory
-from shareds.application.view import BaseSharedView
+from shareds.application.view import BaseSharedView, DynamicGroupPermission
 from products.application.serializers import ProductSerializer
 
 
-class CanCreateProductPermission(BasePermission):
-    """
-    Custom permission class to check if a user has permission to create a product.
-    """
+class IsInProductGroup(DynamicGroupPermission):
+    def __init__(self):
+        super().__init__(group_name="product_group")
 
-    def has_permission(self, request, view):
-        return request.user.has_perm(
-            "products.add_product"
-        )  # Replace with your actual permission check
+
+class HasProductPermission(DynamicGroupPermission):
+    def __init__(self):
+        super().__init__(perm_code="products.view_product")
 
 
 class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
@@ -44,6 +42,7 @@ class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
         """
         super().__init__(ProductsFactory())
         generics.ListCreateAPIView.__init__(self, *args, **kwargs)
+        self.permission_classes = [IsAuthenticated, IsInProductGroup, HasProductPermission]
 
     def get_queryset(self):
         try:
@@ -87,8 +86,8 @@ class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
 
     @swagger_auto_schema(
         operation_description="Create a new product",
-        responses={201: ProductSerializer},
-        request_body=ProductSerializer,
+        responses={201: ProductSerializer()},
+        request_body=ProductSerializer(),
     )
     def post(self, request, *args, **kwargs):
         """
@@ -107,17 +106,7 @@ class ProductListCreate(BaseSharedView, generics.ListCreateAPIView):
             Response: A Django REST framework Response object with the created product or an error message.
         """
         try:
-            # Check if the user has the permission to create a product
-            if not self.request.user.has_perm(
-                "products.add_product"
-            ):  # Replace with your actual permission check
-                raise PermissionDenied("You do not have permission to create products.")
-
             return super().post(request, *args, **kwargs)
-        except PermissionDenied as e:
-            self.logger.error(f"Permission denied: {e}", exc_info=True)
-            return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
-
         except Exception as e:
             self.logger.error(
                 f"Error occurred while creating a product: {e}", exc_info=True
@@ -167,7 +156,7 @@ class ProductRetrieveUpdateDestroy(
             Response: A Django REST framework Response object with an error message if an error occurs.
         """
         try:
-            product_id = self.kwargs.get("pk")
+            product_id = self.kwargs.get("id")
             product = self.service.get_by_id(product_id)
             return product
         except Exception as e:
@@ -178,7 +167,7 @@ class ProductRetrieveUpdateDestroy(
 
     @swagger_auto_schema(
         operation_description="Retrieve a product by ID",
-        responses={200: ProductSerializer},
+        responses={200: ProductSerializer()},
     )
     @method_decorator(cache_page(60 * 15))  # Cache 15 mins
     def get(self, request, *args, **kwargs):
@@ -207,8 +196,8 @@ class ProductRetrieveUpdateDestroy(
 
     @swagger_auto_schema(
         operation_description="Update a product by ID",
-        responses={200: ProductSerializer},
-        request_body=ProductSerializer,
+        responses={200: ProductSerializer()},
+        request_body=ProductSerializer(),
     )
     def put(self, request, *args, **kwargs):
         """
@@ -236,8 +225,8 @@ class ProductRetrieveUpdateDestroy(
 
     @swagger_auto_schema(
         operation_description="Partially update a product by ID",
-        responses={200: ProductSerializer},
-        request_body=ProductSerializer,
+        responses={200: ProductSerializer()},
+        request_body=ProductSerializer(),
     )
     def patch(self, request, *args, **kwargs):
         """

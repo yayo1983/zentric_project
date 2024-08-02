@@ -3,7 +3,6 @@ from products.application.views import ProductListCreate, ProductRetrieveUpdateD
 
 
 urlpatterns = [
-    path('', ProductListCreate.as_view(), name='product-list-create'),
-    path('<int:pk>/', ProductRetrieveUpdateDestroy.as_view(), name='product-detail'),
-
+    path("", ProductListCreate.as_view(), name="product-list-create"),
+    path("<int:id>/", ProductRetrieveUpdateDestroy.as_view(), name="product-detail"),
 ]

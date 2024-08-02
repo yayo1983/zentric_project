@@ -30,7 +30,7 @@ class TicketRepository(SharedRepositoryInterface):
             ValueError: If an error occurs while retrieving the tickets.
         """
         try:
-            return Ticket.objects.select_related('recipient').all()
+            return Ticket.objects.select_related("recipient").all().order_by("id")
         except Exception as e:
             raise ValueError(f"An error occurred while retrieving tickets: {e}") from e
 
@@ -39,7 +39,7 @@ class TicketRepository(SharedRepositoryInterface):
         Retrieve a specific ticket by its ID.
 
         This method fetches a single Ticket object from the database based on the provided ID.
-        If the ticket with the specified ID is not found or an error occurs during retrieval, 
+        If the ticket with the specified ID is not found or an error occurs during retrieval,
         a ValueError is raised with an appropriate error message.
 
         Args:
@@ -52,9 +52,6 @@ class TicketRepository(SharedRepositoryInterface):
             ValueError: If the ticket with the specified ID is not found or an error occurs while retrieving it.
         """
         try:
-            return Ticket.objects.get(id=ticket_id)
+            return Ticket.objects.get(id=ticket_id).order_by("id")
         except Exception as e:
-            raise ValueError(
-                f"An error occurred while retrieving a Ticket: {e}"
-            ) from e
-
+            raise ValueError(f"An error occurred while retrieving a Ticket: {e}") from e
