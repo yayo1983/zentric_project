@@ -10,8 +10,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"  # Expose the port 5432
-    
+      - "5432:5432"
     networks:
       - my-network
 
@@ -21,16 +20,17 @@ services:
     volumes:
       - .:/app
     ports:
-      - "8000:8000"     
+      - "8000:8000"
     depends_on:
       - db
     environment:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      # - FORCE_SCRIPT_NAME=/api/
+      - DB_HOST=db  # Aquí debe coincidir con el nombre del servicio 'db'
+      - DB_PORT=5432
+    networks:
+      - my-network
 
 volumes:
   postgres_data:
